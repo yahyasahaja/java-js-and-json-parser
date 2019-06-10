@@ -27,7 +27,11 @@ class JSONParser {
             } else if (value instanceof String) {
                 result += "\"" + name + "\": \"" + value + "\", ";
             } else if (value != null) {
-                result += "\"" + name + "\": " + parseObject(value, usingNull) + ", ";
+                if (value instanceof ArrayList) {
+                    result += "\"" + name + "\": " + parseArray((ArrayList) value, usingNull) + ", ";
+                } else {
+                    result += "\"" + name + "\": " + parseObject(value, usingNull) + ", ";
+                }
             }
 
 
@@ -85,7 +89,11 @@ class JSParser {
             } else if (value instanceof String) {
                 result += name + ": \"" + value + "\", ";
             } else if (value != null) {
-                result += name + ": " + parseObject(value, usingNull) + ", ";
+                if (value instanceof ArrayList) {
+                    result += name + ": " + parseArray((ArrayList) value, usingNull) + ", ";
+                } else {
+                    result += name + ": " + parseObject(value, usingNull) + ", ";
+                }
             }
 
 
@@ -128,6 +136,17 @@ class Manusia {
     private String telinga;
     private int jumlahMata = 2;
     private Name name = new Name();
+    private ArrayList<Manusia> children;
+
+    public Manusia(Boolean hasChildren) {
+        children = new ArrayList<>();
+        children.add(new Manusia());
+        children.add(new Manusia());
+    }
+
+    public Manusia() {
+
+    }
 }
 
 public class Main {
@@ -152,5 +171,9 @@ public class Main {
         arr.add(new Manusia());
         System.out.println(JSONParser.parseArray(arr));
         System.out.println(JSONParser.parseArray(arr, true));
+
+        System.out.println("\nArray");
+        //JSON
+        System.out.println(JSParser.parseObject(new Manusia(true)));
     }
 }
