@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 class JSONParser {
-    int stack = -1;
+    int stack = 0;
     int maxStack = -1;
 
     public static JSONParser getInstance() {
@@ -34,12 +34,13 @@ class JSONParser {
             } else if (value instanceof String) {
                 result += "\"" + name + "\": \"" + value + "\", ";
             } else if (value != null) {
-                if (stack != -1 && stack <= maxStack) {
+                if (maxStack != -1 && stack <= maxStack) {
                     if (value instanceof ArrayList) {
                         result += "\"" + name + "\": " + parseArray((ArrayList) value, usingNull) + ", ";
                     } else {
                         result += "\"" + name + "\": " + parseObject(value, usingNull) + ", ";
                     }
+                    stack++;
                 }
             }
 
