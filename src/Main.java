@@ -3,7 +3,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 class JSONParser {
-    public static String parseObject(Object obj, Boolean usingNull)  {
+    int stack = -1;
+    int maxStack = -1;
+
+    public static JSONParser getInstance() {
+        return new JSONParser();
+    }
+
+    public String parseObject(Object obj, Boolean usingNull)  {
         HashMap<String, Object> res = new HashMap<>();
         String result = "{ ";
         for (Field field : obj.getClass().getDeclaredFields()) {
@@ -27,10 +34,12 @@ class JSONParser {
             } else if (value instanceof String) {
                 result += "\"" + name + "\": \"" + value + "\", ";
             } else if (value != null) {
-                if (value instanceof ArrayList) {
-                    result += "\"" + name + "\": " + parseArray((ArrayList) value, usingNull) + ", ";
-                } else {
-                    result += "\"" + name + "\": " + parseObject(value, usingNull) + ", ";
+                if (stack != -1 && stack <= maxStack) {
+                    if (value instanceof ArrayList) {
+                        result += "\"" + name + "\": " + parseArray((ArrayList) value, usingNull) + ", ";
+                    } else {
+                        result += "\"" + name + "\": " + parseObject(value, usingNull) + ", ";
+                    }
                 }
             }
 
@@ -45,12 +54,12 @@ class JSONParser {
         return result + " }";
     }
 
-    public static String parseObject(Object obj) {
+    public String parseObject(Object obj) {
         return parseObject(obj, false);
     }
 
-    public static String parseArrayResult;
-    public static String parseArray(ArrayList<Object> objs, Boolean usingNull) {
+    public String parseArrayResult;
+    public String parseArray(ArrayList<Object> objs, Boolean usingNull) {
         parseArrayResult = "[ ";
         objs.forEach((Object obj) -> parseArrayResult += parseObject(obj, usingNull) + ", ");
         if (parseArrayResult.length() > 2) {
@@ -59,13 +68,20 @@ class JSONParser {
         return parseArrayResult + " ]";
     }
 
-    public static String parseArray(ArrayList<Object> objs) {
+    public String parseArray(ArrayList<Object> objs) {
         return parseArray(objs, false);
     }
 }
 
 class JSParser {
-    public static String parseObject(Object obj, Boolean usingNull)  {
+    int stack = -1;
+    int maxStack = -1;
+
+    public static JSParser getInstance() {
+        return new JSParser();
+    }
+
+    public String parseObject(Object obj, Boolean usingNull)  {
         HashMap<String, Object> res = new HashMap<>();
         String result = "{ ";
         for (Field field : obj.getClass().getDeclaredFields()) {
@@ -89,10 +105,12 @@ class JSParser {
             } else if (value instanceof String) {
                 result += name + ": \"" + value + "\", ";
             } else if (value != null) {
-                if (value instanceof ArrayList) {
-                    result += name + ": " + parseArray((ArrayList) value, usingNull) + ", ";
-                } else {
-                    result += name + ": " + parseObject(value, usingNull) + ", ";
+                if (stack != -1 && stack <= maxStack) {
+                    if (value instanceof ArrayList) {
+                        result += name + ": " + parseArray((ArrayList) value, usingNull) + ", ";
+                    } else {
+                        result += name + ": " + parseObject(value, usingNull) + ", ";
+                    }
                 }
             }
 
@@ -107,12 +125,12 @@ class JSParser {
         return result + " }";
     }
 
-    public static String parseObject(Object obj) {
+    public String parseObject(Object obj) {
         return parseObject(obj, false);
     }
 
-    public static String parseArrayResult;
-    public static String parseArray(ArrayList<Object> objs, Boolean usingNull) {
+    public String parseArrayResult;
+    public String parseArray(ArrayList<Object> objs, Boolean usingNull) {
         parseArrayResult = "[ ";
         objs.forEach((Object obj) -> parseArrayResult += parseObject(obj, usingNull) + ", ");
         if (parseArrayResult.length() > 2) {
@@ -121,7 +139,7 @@ class JSParser {
         return parseArrayResult + " ]";
     }
 
-    public static String parseArray(ArrayList<Object> objs) {
+    public String parseArray(ArrayList<Object> objs) {
         return parseArray(objs, false);
     }
 }
@@ -129,6 +147,7 @@ class JSParser {
 class Name {
     private String firstName = "Tzuyu";
     private String lastName = "Yahya";
+    private Manusia manusia;
 }
 
 class Manusia {
@@ -152,28 +171,28 @@ class Manusia {
 public class Main {
     public static void main(String[] args) {
         System.out.println("JS Parser");
-        String res = JSParser.parseObject(new Manusia());
+        String res = JSParser.getInstance().parseObject(new Manusia());
         System.out.println(res);
 
         ArrayList<Object> arr = new ArrayList<>();
         arr.add(new Manusia());
         arr.add(new Manusia());
-        System.out.println(JSParser.parseArray(arr));
-        System.out.println(JSParser.parseArray(arr, true));
+        System.out.println(JSParser.getInstance().parseArray(arr));
+        System.out.println(JSParser.getInstance().parseArray(arr, true));
 
 
         System.out.println("\nJSON Parser");
         //JSON
-        System.out.println(JSONParser.parseObject(new Manusia()));
+        System.out.println(JSONParser.getInstance().parseObject(new Manusia()));
 
         arr = new ArrayList<>();
         arr.add(new Manusia());
         arr.add(new Manusia());
-        System.out.println(JSONParser.parseArray(arr));
-        System.out.println(JSONParser.parseArray(arr, true));
+        System.out.println(JSONParser.getInstance().parseArray(arr));
+        System.out.println(JSONParser.getInstance().parseArray(arr, true));
 
         System.out.println("\nArray");
         //JSON
-        System.out.println(JSParser.parseObject(new Manusia(true)));
+        System.out.println(JSParser.getInstance().parseObject(new Manusia(true)));
     }
 }
